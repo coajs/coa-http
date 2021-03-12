@@ -1,0 +1,38 @@
+{
+  "name": "coa-http",
+  "version": "0.0.3",
+  "description": "http server for coa",
+  "keywords": [
+    "coajs",
+    "coa",
+    "koa",
+    "serve",
+    "http"
+  ],
+  "license": "MIT",
+  "author": "Aex",
+  "homepage": "https://github.com/coajs/coa-http",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/coajs/coa-http.git"
+  },
+  "scripts": {
+    "dev": "tsc -w",
+    "build": "rm -rf dist && tsc && cp package.json dist",
+    "publish-patch": "yarn build && yarn version --patch && cp package.json README.md dist && cd dist && npm publish",
+    "publish-prerelease": "yarn build && yarn version --prerelease && cp package.json README.md dist && cd dist && npm publish"
+  },
+  "dependencies": {
+    "coa-echo": "^1.0.8",
+    "coa-env": "^1.1.1",
+    "coa-error": "^1.1.3",
+    "coa-helper": "^1.1.1",
+    "coa-secure": "^1.1.2",
+    "source-map-support": "^0.5.19"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.34",
+    "typescript": "^4.2.3"
+  },
+  "peerDependencies": {}
+}
