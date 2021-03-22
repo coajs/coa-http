@@ -1,7 +1,7 @@
 {
   "name": "coa-http",
-  "version": "0.0.4",
-  "description": "http server for coa",
+  "version": "0.0.0",
+  "description": "A simple, fast and lightweight HTTP service framework",
   "keywords": [
     "coajs",
     "coa",
@@ -11,15 +11,14 @@
   ],
   "license": "MIT",
   "author": "Aex",
-  "homepage": "https://github.com/coajs/coa-http",
+  "homepage": "https://github.com/coajs",
   "repository": {
     "type": "git",
     "url": "https://github.com/coajs/coa-http.git"
   },
   "scripts": {
     "dev": "tsc -w",
-    "build": "rm -rf dist && tsc && cp package.json dist",
-    "publish-patch": "yarn build && yarn version --patch && cp package.json README.md dist && cd dist && npm publish",
+    "build": "rm -rf dist && tsc && cp package.json *.md dist",
     "publish-prerelease": "yarn build && yarn version --prerelease && cp package.json README.md dist && cd dist && npm publish"
   },
   "dependencies": {
@@ -31,8 +30,7 @@
     "source-map-support": "^0.5.19"
   },
   "devDependencies": {
-    "@types/node": "^14.14.34",
+    "@types/node": "^14.14.35",
     "typescript": "^4.2.3"
-  },
-  "peerDependencies": {}
+  }
 }
