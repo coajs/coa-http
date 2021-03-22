@@ -28,6 +28,7 @@ jobs:
 
       - name: Build
         run: |
+          yarn
           npm --no-git-tag-version version ${{ github.event.release.tag_name }}
           npm run build
 
