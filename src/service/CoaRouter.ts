@@ -30,23 +30,25 @@ export class CoaRouter<T> {
   public readonly configs: CoaRouter.Configs = {}
 
   private DATA = { group: '', tag: '' }
+  private base: string
 
-  constructor () {
+  constructor (base: string) {
+    this.base = base
   }
 
-  // 注册路由
-  register (base: string, name: string, routes: CoaRouter.Routes<T>) {
+  // 注册一批路由
+  register (name: string, routes: CoaRouter.Routes<T>) {
     this.tags[this.DATA.tag] = name
     Object.keys(routes).forEach(path => {
       const { options, handler } = routes[path] || {}
       const { method, name } = options
       if (!(path && method && name && handler)) return
-      if (!path.startsWith('/')) path = base + path
+      if (!path.startsWith('/')) path = this.base + path
       this.on(method, path, handler, options)
     })
   }
 
-  // 配置
+  // 设置当前组的路由配置
   config (config: any) {
     const { group } = this.DATA
     this.configs[group] = config
@@ -68,6 +70,7 @@ export class CoaRouter<T> {
     }
   }
 
+  // 新增一个路由
   on (method: string, path: string, handler: CoaRouter.Handler<T>, options: CoaRouter.Options = {}) {
     const { group, tag } = this.DATA
     this.layers[path.toLowerCase()] = { group, tag, method, path, options, handler }
@@ -84,6 +87,7 @@ export class CoaRouter<T> {
     // 添加URL路径参数的支持
     let layer = this.layers[path]
     if (!layer) {
+      // 目前仅支持以*结尾的通配符
       const path2 = path.replace(/([/.])(\w+)$/, (str, $1, $2) => {
         params.path.push($2)
         return $1 + '*'

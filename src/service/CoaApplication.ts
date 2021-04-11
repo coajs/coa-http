@@ -6,14 +6,13 @@ import { CoaRouter } from './CoaRouter'
 
 export class CoaApplication<T extends CoaContext> {
 
-  public readonly router: CoaRouter<T>
-
+  private readonly router: CoaRouter<T>
   private readonly Context: CoaContext.Constructor<T>
   private readonly startAt: bigint = process.hrtime.bigint()
 
-  constructor (Context: CoaContext.Constructor<T>) {
+  constructor (Context: CoaContext.Constructor<T>, router: CoaRouter<T>) {
     this.Context = Context
-    this.router = new CoaRouter<T>()
+    this.router = router
     echo.info(`[server] Booting...`)
   }
 
