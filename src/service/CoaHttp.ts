@@ -1,9 +1,9 @@
 import { CoaEnv } from 'coa-env'
+import { CoaSwagger } from '../lib/CoaSwagger'
+import { CoaSwaggerCode } from '../lib/CoaSwaggerCode'
 import { CoaApplication } from './CoaApplication'
 import { CoaContext } from './CoaContext'
 import { CoaRouter } from './CoaRouter'
-import { CoaSwagger } from './lib/CoaSwagger'
-import { CoaSwaggerCode } from './lib/CoaSwaggerCode'
 
 export namespace CoaGateway {
   export interface Config {

@@ -1,5 +1,5 @@
 import { _ } from 'coa-helper'
-import { CoaRouter } from '../CoaRouter'
+import { CoaRouter } from '../service/CoaRouter'
 
 export class CoaSwagger {
 
