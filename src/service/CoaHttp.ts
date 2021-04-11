@@ -5,26 +5,26 @@ import { CoaApplication } from './CoaApplication'
 import { CoaContext } from './CoaContext'
 import { CoaRouter } from './CoaRouter'
 
-export namespace CoaGateway {
+export namespace CoaHttp {
   export interface Config {
-    baseUrl: string
     routeDir: string
+    baseUrl: string
   }
 }
 
 export class CoaHttp<T extends CoaContext> {
 
-  private readonly router: CoaRouter<T>
-  private readonly application: CoaApplication<T>
+  public readonly router: CoaRouter<T>
 
-  private readonly config: CoaGateway.Config
+  private readonly application: CoaApplication<T>
+  private readonly config: CoaHttp.Config
   private readonly env: CoaEnv
 
-  constructor (Context: CoaContext.Constructor<T>, env: CoaEnv = new CoaEnv('1.0.0'), config: Partial<CoaGateway.Config> = {}) {
-    this.application = new CoaApplication<T>(Context)
-    this.router = this.application.router
-    this.env = env
+  constructor (Context: CoaContext.Constructor<T>, env?: CoaEnv, config?: Partial<CoaHttp.Config>) {
+    this.env = env || new CoaEnv('1.0.0')
     this.config = Object.assign({ baseUrl: '/gw/', routeDir: 'gateway' }, config)
+    this.router = new CoaRouter<T>(this.config.baseUrl)
+    this.application = new CoaApplication<T>(Context, this.router)
   }
 
   async start () {
@@ -41,7 +41,7 @@ export class CoaHttp<T extends CoaContext> {
 
   // 注册路由
   register (name: string, routes: CoaRouter.Routes<T>) {
-    this.router.register(this.config.baseUrl, name, routes)
+    this.router.register(name, routes)
   }
 
   // 注册配置

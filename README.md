@@ -51,12 +51,12 @@ yarn add typescript tsc-watch @types/node -D
 ### 创建文件
 
 ```shell
-gateway            #网关层
-├─ index.ts        #网关入口
-├─ debug           #其中一个模块
-│  └─ test.ts      #模块下具体路由的实现
-service            #服务层
-├─ index.ts        #具体服务的实现
+gateway            # 网关层
+├─ index.ts        # 网关入口
+├─ debug           # 其中一个模块
+│  └─ test.ts      # 模块下具体路由的实现
+service            # 服务层
+├─ index.ts        # 具体服务的实现
 package.json
 tsconfig.json
 ```
@@ -78,7 +78,7 @@ http.start().then(() => {
 ```typescript
 import { http } from '..'
 
-http.register('调试', {
+http.router.register('调试', {
 
   '/debug/test/hello': {
     options: {
