@@ -40,7 +40,7 @@ export class CoaSwagger {
 
   constructor (router: CoaRouter<any>, config: CoaSwagger.Config) {
     this.router = router
-    this.config = Object.assign({}, { swaggerFilter: false, swaggerDocExpansion: 'list' }, config)
+    this.config = Object.assign({ swaggerFilter: false, swaggerDocExpansion: 'list' }, config)
   }
 
   getData (matchGroup: string, serverUrl: string, codeUrl: string, version: string) {

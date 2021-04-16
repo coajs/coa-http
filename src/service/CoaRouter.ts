@@ -36,7 +36,7 @@ export class CoaRouter<T> {
   private readonly config: CoaRouter.Config
 
   constructor (config: CoaRouter.Config) {
-    this.config = Object.assign({}, { baseUrl: '/api/' }, config)
+    this.config = Object.assign({ baseUrl: '/api/' }, config)
   }
 
   // 注册一批路由
