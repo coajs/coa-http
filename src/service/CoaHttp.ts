@@ -21,7 +21,7 @@ export class CoaHttp<T extends CoaContext> {
 
   constructor (Context: CoaContext.Constructor<T>, env?: CoaEnv, config?: Partial<CoaHttp.Config>) {
     this.env = env || new CoaEnv('1.0.0')
-    this.config = Object.assign({}, { routeDir: 'gateway' }, config) as CoaHttp.Config
+    this.config = Object.assign({ routeDir: 'gateway' }, config) as CoaHttp.Config
     this.router = new CoaRouter<T>(this.config)
     this.application = new CoaApplication<T>(Context, this.router)
   }
