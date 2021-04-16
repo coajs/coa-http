@@ -20,20 +20,23 @@ export namespace CoaRouter {
   export type Layer<T> = { group: string, tag: string, method: string, path: string, options: Options, handler: CoaRouter.Handler<T> }
   export type Layers<T> = { [pathname: string]: Layer<T> }
   export type Tags = { [tag: string]: string }
-  export type Configs = { [group: string]: any }
+  export type SwaggerConfigs = { [group: string]: any }
+  export interface Config {
+    baseUrl: string
+  }
 }
 
 export class CoaRouter<T> {
 
   public readonly layers: CoaRouter.Layers<T> = {}
   public readonly tags: CoaRouter.Tags = {}
-  public readonly configs: CoaRouter.Configs = {}
+  public readonly configs: CoaRouter.SwaggerConfigs = {}
 
-  private DATA = { group: '', tag: '' }
-  private base: string
+  private readonly DATA = { group: '', tag: '' }
+  private readonly config: CoaRouter.Config
 
-  constructor (base: string) {
-    this.base = base
+  constructor (config: CoaRouter.Config) {
+    this.config = Object.assign({}, { baseUrl: '/api/' }, config)
   }
 
   // 注册一批路由
@@ -43,13 +46,13 @@ export class CoaRouter<T> {
       const { options, handler } = routes[path] || {}
       const { method, name } = options
       if (!(path && method && name && handler)) return
-      if (!path.startsWith('/')) path = this.base + path
+      if (!path.startsWith('/')) path = this.config.baseUrl + path
       this.on(method, path, handler, options)
     })
   }
 
   // 设置当前组的路由配置
-  config (config: any) {
+  setSwaggerConfig (config: any) {
     const { group } = this.DATA
     this.configs[group] = config
   }
