@@ -1,6 +1,13 @@
 import { _ } from 'coa-helper'
 import { CoaRouter } from '../service/CoaRouter'
 
+export namespace CoaSwagger {
+  export interface Config {
+    swaggerFilter: boolean,
+    swaggerDocExpansion: 'full' | 'list' | 'none'
+  }
+}
+
 export class CoaSwagger {
 
   private data = {
@@ -29,9 +36,11 @@ export class CoaSwagger {
   }
 
   private readonly router: CoaRouter<any>
+  private readonly config: CoaSwagger.Config
 
-  constructor (router: CoaRouter<any>) {
+  constructor (router: CoaRouter<any>, config: CoaSwagger.Config) {
     this.router = router
+    this.config = Object.assign({}, { swaggerFilter: false, swaggerDocExpansion: 'list' }, config)
   }
 
   getData (matchGroup: string, serverUrl: string, codeUrl: string, version: string) {
@@ -75,7 +84,7 @@ export class CoaSwagger {
     if (group.length) group = _.startCase(group)
     const groupNames = group.length && groups[group] ? [group] : Object.keys(groups)
     const urls = groupNames.map(name => ({ name, url: dataUrl + _.snakeCase(name) }))
-    return getHtml(urls)
+    return getHtml(urls, this.config)
   }
 
   private getOneAction (tag: string, method: string, path: string, opt: any, security: string[]) {
@@ -189,7 +198,7 @@ export class CoaSwagger {
   }
 }
 
-const getHtml = (urls: object[]) => `
+const getHtml = (urls: object[], config: CoaSwagger.Config) => `
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -355,11 +364,11 @@ const getHtml = (urls: object[]) => `
 
             deepLinking: true,
             
-            filter: false,
+            filter: ${config.swaggerFilter},
 
             validatorUrl: null,
 
-            docExpansion: 'list',
+            docExpansion: '${config.swaggerDocExpansion}',
 
             defaultModelsExpandDepth: 10,
             defaultModelExpandDepth : 10,

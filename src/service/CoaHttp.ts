@@ -6,9 +6,8 @@ import { CoaContext } from './CoaContext'
 import { CoaRouter } from './CoaRouter'
 
 export namespace CoaHttp {
-  export interface Config {
+  export interface Config extends CoaRouter.Config, CoaSwagger.Config {
     routeDir: string
-    baseUrl: string
   }
 }
 
@@ -22,8 +21,8 @@ export class CoaHttp<T extends CoaContext> {
 
   constructor (Context: CoaContext.Constructor<T>, env?: CoaEnv, config?: Partial<CoaHttp.Config>) {
     this.env = env || new CoaEnv('1.0.0')
-    this.config = Object.assign({ baseUrl: '/gw/', routeDir: 'gateway' }, config)
-    this.router = new CoaRouter<T>(this.config.baseUrl)
+    this.config = Object.assign({}, { routeDir: 'gateway' }, config) as CoaHttp.Config
+    this.router = new CoaRouter<T>(this.config)
     this.application = new CoaApplication<T>(Context, this.router)
   }
 
@@ -46,7 +45,7 @@ export class CoaHttp<T extends CoaContext> {
 
   // 注册配置
   routerConfig (config: any) {
-    this.router.config(config)
+    this.router.setSwaggerConfig(config)
   }
 
   // 注册系统内置路由
@@ -54,11 +53,11 @@ export class CoaHttp<T extends CoaContext> {
     const baseUrl = this.config.baseUrl
     // 注册文档
     this.router.on('GET', baseUrl + 'doc', async ctx => {
-      const swagger = new CoaSwagger(this.router)
+      const swagger = new CoaSwagger(this.router, this.config)
       return swagger.getHtml(baseUrl + 'doc.json?group=', ctx.get('group'))
     })
     this.router.on('GET', baseUrl + 'doc.json', async ctx => {
-      const swagger = new CoaSwagger(this.router)
+      const swagger = new CoaSwagger(this.router, this.config)
       return swagger.getData(ctx.request.query.group, `${ctx.protocol}://${ctx.host}`, baseUrl + 'doc.code?group=', this.env.version)
     })
     this.router.on('GET', baseUrl + 'doc.code', async ctx => {
