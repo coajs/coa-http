@@ -41,6 +41,7 @@ export class CoaApplication<T extends CoaContext> {
       // 处理参数
       const bodyParams = await new CoaRequestBody(req).get()
 
+      // 将route参数和body参数附加到ctx上
       Object.assign(ctx.request, routeParams, bodyParams)
 
       // 如果是系统默认路由，则不显示请求记录
@@ -78,7 +79,9 @@ export class CoaApplication<T extends CoaContext> {
     ctx.res.setHeader('Content-Type', ctx.response.contentType)
     ctx.res.setHeader('Cache-Control', ctx.response.cacheControl)
 
+    // 发送结果
     ctx.res.end(ctx.response.body, () => {
+      // 记录请求
       ctx.runtime.accessLog && echo.cyan(`[${ctx.req.method}] ${ctx.req.url} - ${Number(process.hrtime.bigint() - ctx.runtime.startAt) / 1e6}ms`)
     })
   }

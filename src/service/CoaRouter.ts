@@ -89,9 +89,11 @@ export class CoaRouter<T> {
 
     // 添加URL路径参数的支持
     let layer = this.layers[path]
+    // 如果全匹配的结果不存在，则尝试匹配通配符
     if (!layer) {
       // 目前仅支持以*结尾的通配符
       const path2 = path.replace(/([/.])(\w+)$/, (str, $1, $2) => {
+        // 将path参数加入
         params.path.push($2)
         return $1 + '*'
       })
@@ -103,7 +105,7 @@ export class CoaRouter<T> {
     const handler = layer.handler || CoaError.throw('Gateway.HandlerNotFound', '当前网关接口处理方法不存在')
     const group = layer.group
 
-    // 解析参数
+    // 解析query参数
     if (urls[1])
       params.query = querystring.parse(urls[1]) as { [key: string]: string }
 
