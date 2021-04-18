@@ -8,7 +8,7 @@ export namespace CoaRouter {
   export type Options = {
     name?: string,
     desc?: string,
-    method?: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
     param?: { [i: string]: any },
     result?: { [i: string]: any },
     delete?: boolean,
