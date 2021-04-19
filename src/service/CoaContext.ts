@@ -20,8 +20,9 @@ export class CoaContext {
 
   // 响应结果等信息
   public readonly response = {
+    respond: true,
     statusCode: 200 as number,
-    contentType: 'application/json; charset=utf-8' as string,
+    contentType: '' as string,
     cacheControl: 'no-cache',
     body: '' as string
   }
