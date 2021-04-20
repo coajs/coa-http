@@ -80,4 +80,10 @@ export class CoaContext {
     this.response.body = JSON.stringify(data)
   }
 
+  // 设置为自定义响应结果
+  custom () {
+    this.response.respond = false
+    return undefined
+  }
+
 }

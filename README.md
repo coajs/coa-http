@@ -226,15 +226,15 @@ http.router.register('调试', {
       // 获取网络上的资源流
       const { data, status, headers } = await axios.get(url, { responseType: 'stream' }).catch(e => e.response)
 
-      // 将respond设置为false，coa-http将不会接管下面的响应处理
-      ctx.response.respond = false
-
       // 设置响应信息
       ctx.res.statusCode = status
       ctx.res.setHeader('Content-Type', headers['content-type'])
 
       // 网络上的资源流通过管道方式流入响应流
       data.pipe(ctx.res)
+
+      // 自定义响应结果，coa-http将不会进行后续的响应处理
+      return ctx.custom()
     }
   },
 })
