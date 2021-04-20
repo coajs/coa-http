@@ -74,6 +74,10 @@ export class CoaApplication<T extends CoaContext> {
       echo.warn('# 返回: %j', { error })
     }
 
+    // 如果不处理，则直接返回结果
+    if (!ctx.response.respond)
+      return
+
     // 开始处理结果
     ctx.res.statusCode = ctx.response.statusCode
     ctx.res.setHeader('Content-Type', ctx.response.contentType)

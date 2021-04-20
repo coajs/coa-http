@@ -15,7 +15,7 @@ export namespace CoaRouter {
     legacy?: string,
     access?: string
   }
-  export type Handler<T> = (ctx: T) => Promise<object | string>
+  export type Handler<T> = (ctx: T) => Promise<object | string | undefined>
   export type Routes<T> = { [path: string]: { options: Options, handler: Handler<T> } }
   export type Layer<T> = { group: string, tag: string, method: string, path: string, options: Options, handler: CoaRouter.Handler<T> }
   export type Layers<T> = { [pathname: string]: Layer<T> }
