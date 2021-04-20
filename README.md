@@ -137,4 +137,105 @@ Found 0 errors. Watching for file changes.
 [server] Listening on: http://localhost:3000/gw/doc
 ```
 
-此时使用浏览器打开 `http://localhost:3000/gw/doc` 可以直接打开并查看接口文档
+此时使用浏览器打开 `http://localhost:3000/gw/doc` 可以直接打开并查看接口文档。
+
+## 路由
+
+### 基本使用
+
+使用 `http.router.register` 方法注册路由，一个最简单的路由如下所示。
+
+```typescript
+http.router.register('调试', {
+  '/debug/test/hello': {
+    options: {
+      name: '测试', // 名称
+      method: 'GET', // 调用方法
+      param: {
+        title: { required: true, description: '标题参数', example: 'test' },
+      }
+    },
+    async handler (ctx) {
+      // 获取所有的query参数
+      const query = ctx.request.query
+      // 获取title参数
+      const title2  = ctx.get('title')
+      // 使用json的格式返回结果
+      return { query, title }
+    }
+  },
+})
+```
+
+### 路由分组
+
+每注册一批路由，会自动划分为一组。在业务开发时，可以将每个模块拆分为文件单独分组。
+
+```typescript
+// gateway/module-a.ts
+http.router.register('A模块', {
+  '/api/module-a/action-1': { /* ... */ },
+  '/api/module-a/action-2': { /* ... */ },
+})
+// gateway/module-b.ts
+http.router.register('B模块', {
+  '/api/module-b/action-1': { /* ... */ },
+  '/api/module-b/action-2': { /* ... */ },
+  '/api/module-b/action-3': { /* ... */ },
+})
+```
+
+### Context上下文
+
+和 `koa` 类似，`handler` 方法包含一个 `ctx` 参数。`ctx` 是一个Context的实例，包含当前请求过程中上下文所有信息。
+
+```typescript
+http.router.register('调试', {
+  '/debug/test/hello': {
+    options: {
+      method: 'GET',
+      name: '你好世界'
+    },
+    async handler (ctx) {
+      // ctx包含所有上下文信息
+      return { result: 'hello,world!' }
+    }
+  },
+})
+```
+
+### 自定义响应格式
+
+`coa-http` 原生支持 `json` 和 `text` 形式的响应结果。但有时候我们需要自定义响应格式，比如流的形式。下面的例子展示了将网络上的资源通过流的形式直接返回。
+
+```typescript
+http.router.register('调试', {
+  '/debug/test/proxy': {
+    options: {
+      method: 'GET',
+      name: '流的形式返回结果',
+      param:{
+        title: { required: true, description: '网络资源路径', example: 'http://github.com' },
+      }
+    },
+    async handler (ctx) {
+      
+      // 获取url参数
+      const url = ctx.required('url', '')
+
+      // 获取网络上的资源流
+      const { data, status, headers } = await axios.get(url, { responseType: 'stream' }).catch(e => e.response)
+
+      // 将respond设置为false，coa-http将不会接管下面的响应处理
+      ctx.response.respond = false
+
+      // 设置响应信息
+      ctx.res.statusCode = status
+      ctx.res.setHeader('Content-Type', headers['content-type'])
+
+      // 网络上的资源流通过管道方式流入响应流
+      data.pipe(ctx.res)
+    }
+  },
+})
+```
