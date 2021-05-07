@@ -1,15 +1,14 @@
 import { secure } from 'coa-secure'
 
 export class CoaSession {
-
-  private readonly value: any = {}
+  private readonly value: any
 
   constructor (ticket: string) {
-    this.value = secure.session_decode(ticket)
+    this.value = secure.session_decode(ticket) || {}
   }
 
   get () {
-    return this.value || {}
+    return this.value
   }
 
   encode (value: any, ms: number) {

@@ -1,20 +1,17 @@
 import { _ } from 'coa-helper'
 import { CoaRouter } from '../service/CoaRouter'
 
-export namespace CoaSwagger {
-  export interface Config {
-    swaggerFilter: boolean,
-    swaggerDocExpansion: 'full' | 'list' | 'none'
-  }
+export interface CoaSwaggerConfig {
+  swaggerFilter: boolean
+  swaggerDocExpansion: 'full' | 'list' | 'none'
 }
 
 export class CoaSwagger {
-
   private data = {
     openapi: '3.0.0',
     info: {
       title: '后端接口文档',
-      version: '',
+      version: ''
       // description: '',
     },
     externalDocs: {
@@ -30,15 +27,15 @@ export class CoaSwagger {
     components: {
       securitySchemes: {
         userAccess: { type: 'apiKey', in: 'header', name: 'access' },
-        managerAccess: { type: 'apiKey', in: 'header', name: 'passport' },
+        managerAccess: { type: 'apiKey', in: 'header', name: 'passport' }
       }
-    },
+    }
   }
 
   private readonly router: CoaRouter<any>
-  private readonly config: CoaSwagger.Config
+  private readonly config: CoaSwaggerConfig
 
-  constructor (router: CoaRouter<any>, config: CoaSwagger.Config) {
+  constructor (router: CoaRouter<any>, config: CoaSwaggerConfig) {
     this.router = router
     this.config = Object.assign({ swaggerFilter: false, swaggerDocExpansion: 'list' }, config)
   }
@@ -88,7 +85,6 @@ export class CoaSwagger {
   }
 
   private getOneAction (tag: string, method: string, path: string, opt: any, security: string[]) {
-
     opt = _.defaults(opt, {
       name: '',
       desc: '',
@@ -98,7 +94,7 @@ export class CoaSwagger {
       param: {},
       result: {},
       delete: false,
-      access: true,
+      access: true
     })
 
     // 预处理
@@ -118,21 +114,18 @@ export class CoaSwagger {
           content: {
             'application/json': {}
           }
-        },
+        }
       },
       deprecated: opt.delete,
-      security: <any[]>[]
+      security: [] as any[]
     }
 
     // 处理param参数
     if (!_.isEmpty(opt.param)) {
-      if (method === 'get')
-        opt.query = _.extend(opt.param, opt.query)
-      else
-        opt.body = _.extend(opt.param, opt.body)
+      if (method === 'get') { opt.query = _.extend(opt.param, opt.query) } else { opt.body = _.extend(opt.param, opt.body) }
     }
-    if (!opt.path['id'] && path.endsWith(':id')) {
-      opt.path['id'] = { required: true, description: 'ID', example: '' }
+    if (!opt.path.id && path.endsWith(':id')) {
+      opt.path.id = { required: true, description: 'ID', example: '' }
     }
 
     // 处理path
@@ -143,7 +136,7 @@ export class CoaSwagger {
         required: !!v.required,
         description: v.desc || v.description || '',
         example: v.example || '',
-        schema: { type: v.type || typeof v.example, }
+        schema: { type: v.type || typeof v.example }
       })
     })
 
@@ -155,7 +148,7 @@ export class CoaSwagger {
         required: !!v.required,
         description: v.desc || v.description || '',
         example: v.example || '',
-        schema: { type: v.type || typeof v.example, }
+        schema: { type: v.type || typeof v.example }
       })
     })
 
@@ -180,12 +173,12 @@ export class CoaSwagger {
   }
 
   private getSchema (data: any) {
-    let schema = { type: 'object', properties: {} as any, required: [] as string[] }
+    const schema = { type: 'object', properties: {} as any, required: [] as string[] }
     _.forEach(data, (v: any, k: string) => {
       schema.properties[k] = {
         description: v.desc || v.description,
         type: typeof v.example,
-        example: v.example,
+        example: v.example
       }
       if (v.data) {
         const subSchema = this.getSchema(v.data)
@@ -198,7 +191,7 @@ export class CoaSwagger {
   }
 }
 
-const getHtml = (urls: object[], config: CoaSwagger.Config) => `
+const getHtml = (urls: object[], config: CoaSwaggerConfig) => `
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -364,7 +357,7 @@ const getHtml = (urls: object[], config: CoaSwagger.Config) => `
 
             deepLinking: true,
             
-            filter: ${config.swaggerFilter},
+            filter: ${config.swaggerFilter.toString()},
 
             validatorUrl: null,
 

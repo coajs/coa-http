@@ -1,6 +1,7 @@
-export class CoaStorage {
+interface CoaStorageData { local: any, session: any }
 
-  private data = { local: {} as any, session: {} as any } as any
+export class CoaStorage {
+  private readonly data: CoaStorageData = { local: {}, session: {} }
 
   local (name: string, data: any, ms = 0) {
     this.data.local[name] = { action: 'set', data, ms }
