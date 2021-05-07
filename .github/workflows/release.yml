@@ -26,11 +26,17 @@ jobs:
           node-version: 12
           registry-url: https://registry.npmjs.org
 
+      - name: Yarn
+        run: yarn
+
+      - name: Lint
+        run: yarn lint
+
       - name: Build
         run: |
           yarn
           npm --no-git-tag-version version ${{ github.event.release.tag_name }}
-          npm run build
+          yarn build
 
       - name: Publish
         env:
@@ -42,4 +48,4 @@ jobs:
       - name: Sync
         run: |
           sleep 5s
-          npm run sync
+          yarn sync
