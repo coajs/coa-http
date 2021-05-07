@@ -2,7 +2,6 @@ import { _ } from 'coa-helper'
 import { CoaRouter } from '../service/CoaRouter'
 
 export class CoaSwaggerCode {
-
   private readonly router: CoaRouter<any>
 
   constructor (router: CoaRouter<any>) {
@@ -12,7 +11,8 @@ export class CoaSwaggerCode {
   getHtml (base: string, matchGroup: string) {
     matchGroup = _.startCase(matchGroup)
 
-    const layerTagMaps = {} as { [tag: string]: string[] }, code = new Code()
+    const layerTagMaps: { [tag: string]: string[] } = {}
+    const code = new Code()
 
     // 预处理
     _.forEach(this.router.layers, ({ group, tag, method, path, options: { name } }, key) => {
@@ -27,29 +27,25 @@ export class CoaSwaggerCode {
     code.newGroup(base + matchGroup)
 
     _.forEach(layerTagMaps, (paths, tag) => {
-
       code.newTag(tag, this.router.tags[tag])
 
       _.forEach(paths, key => {
         const { method, path, options: { name = '' } } = this.router.layers[key]
-        const action = path.replace(base, '').split(/[\/.]/, 3).pop() || ''
+        const action = path.replace(base, '').split(/[/.]/, 3).pop() || ''
         code.newApi(name, method, action, path)
       })
 
       code.close()
-
     })
 
     code.close()
 
     return toHtml(matchGroup, code.toString())
   }
-
 }
 
 class Code {
-
-  private contents = [] as string[]
+  private readonly contents = [] as string[]
   private indent = ''
 
   newGroup (group: string) {
@@ -71,7 +67,7 @@ class Code {
 
   close () {
     this.newIndent('close')
-    this.newline(`}`)
+    this.newline('}')
   }
 
   toString () {

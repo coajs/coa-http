@@ -1,28 +1,27 @@
 import { echo } from 'coa-echo'
+import { _ } from 'coa-helper'
 import { createServer, IncomingMessage, ServerResponse } from 'http'
 import { CoaRequestBody } from '../lib/CoaRequestBody'
-import { CoaContext } from './CoaContext'
+import { CoaContext, CoaContextConstructor } from './CoaContext'
 import { CoaRouter } from './CoaRouter'
 
 export class CoaApplication<T extends CoaContext> {
-
   private readonly router: CoaRouter<T>
-  private readonly Context: CoaContext.Constructor<T>
+  private readonly Context: CoaContextConstructor<T>
   private readonly startAt: bigint = process.hrtime.bigint()
 
-  constructor (Context: CoaContext.Constructor<T>, router: CoaRouter<T>) {
+  constructor (Context: CoaContextConstructor<T>, router: CoaRouter<T>) {
     this.Context = Context
     this.router = router
-    echo.info(`[server] Booting...`)
+    echo.info('[server] Booting...')
   }
 
-  async start (entry: string = '') {
-
+  async start (entry: string = ''): Promise<void> {
     // 设置端口
     const port = parseInt(process.env.HOST || '') || 8000
 
     // 启动服务
-    const server = createServer((req, res) => this.requestListener(req, res).catch(e => echo.error(e)))
+    const server = createServer(async (req, res) => await this.requestListener(req, res).catch(e => { echo.error(e) }))
     server.listen(port, () => {
       echo.info(`[server] Startup successful in: ${Number(process.hrtime.bigint() - this.startAt) / 1e6} ms`)
       echo.info(`[server] Listening on: http://localhost:${port}${entry}`)
@@ -30,12 +29,10 @@ export class CoaApplication<T extends CoaContext> {
   }
 
   // 监听请求
-  private async requestListener (req: IncomingMessage, res: ServerResponse) {
-
+  private async requestListener (req: IncomingMessage, res: ServerResponse): Promise<void> {
     const ctx = new this.Context(req, res)
 
     try {
-
       // 寻找路由
       const { handler, params: routeParams, group } = this.router.lookup(ctx.req.method, ctx.req.url)
       // 处理参数
@@ -48,16 +45,16 @@ export class CoaApplication<T extends CoaContext> {
       if (!group) ctx.runtime.accessLog = false
 
       // 执行方法
-      const body = await handler(ctx) as any
-      const type = typeof body as string
+      const body = await handler(ctx)
+      const type = typeof body
 
-      if (type === 'object')
+      if (type === 'object') {
         ctx.json(body)
-      else if (type === 'string')
-        ctx.html(body)
-
+      } else if (type === 'string') {
+        ctx.html(body as string)
+      }
     } catch (e) {
-
+      // 捕获错误
       const isCoaError = e.name === 'CoaError'
       const isCoaContextError = e.name === 'CoaContextError'
 
@@ -65,7 +62,7 @@ export class CoaApplication<T extends CoaContext> {
       if (!(isCoaError || isCoaContextError) || e.stdout !== false) echo.error(e.stack || e.toString() || e)
 
       const error = {
-        code: (isCoaError && e.code) || (isCoaContextError && 'Context.Error.' + e.code) || 'Gateway.HandlerError',
+        code: (isCoaError && e.code) || (isCoaContextError && 'Context.Error.' + _.toString(e.code)) || 'Gateway.HandlerError',
         message: e.message || e.toString()
       }
       ctx.json({ error })
@@ -75,8 +72,7 @@ export class CoaApplication<T extends CoaContext> {
     }
 
     // 如果不处理，则直接返回结果
-    if (!ctx.response.respond)
-      return
+    if (!ctx.response.respond) { return }
 
     // 开始处理结果
     ctx.res.statusCode = ctx.response.statusCode
@@ -86,7 +82,7 @@ export class CoaApplication<T extends CoaContext> {
     // 发送结果
     ctx.res.end(ctx.response.body, () => {
       // 记录请求
-      ctx.runtime.accessLog && echo.cyan(`[${ctx.req.method}] ${ctx.req.url} - ${Number(process.hrtime.bigint() - ctx.runtime.startAt) / 1e6}ms`)
+      ctx.runtime.accessLog && echo.cyan(`[${ctx.req.method || ''}] ${ctx.req.url || ''} - ${Number(process.hrtime.bigint() - ctx.runtime.startAt) / 1e6}ms`)
     })
   }
 }

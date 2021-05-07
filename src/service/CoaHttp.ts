@@ -1,33 +1,29 @@
 import { CoaEnv } from 'coa-env'
-import { CoaSwagger } from '../lib/CoaSwagger'
+import { CoaSwagger, CoaSwaggerConfig } from '../lib/CoaSwagger'
 import { CoaSwaggerCode } from '../lib/CoaSwaggerCode'
 import { CoaApplication } from './CoaApplication'
-import { CoaContext } from './CoaContext'
-import { CoaRouter } from './CoaRouter'
+import { CoaContext, CoaContextConstructor } from './CoaContext'
+import { CoaRouter, CoaRouterConfig, CoaRouterRoutes } from './CoaRouter'
 
-export namespace CoaHttp {
-  export interface Config extends CoaRouter.Config, CoaSwagger.Config {
-    routeDir: string
-  }
+interface CoaHttpConfig extends CoaRouterConfig, CoaSwaggerConfig{
+  routeDir: string
 }
 
 export class CoaHttp<T extends CoaContext> {
-
   public readonly router: CoaRouter<T>
 
   private readonly application: CoaApplication<T>
-  private readonly config: CoaHttp.Config
+  private readonly config: CoaHttpConfig
   private readonly env: CoaEnv
 
-  constructor (Context: CoaContext.Constructor<T>, env?: CoaEnv, config?: Partial<CoaHttp.Config>) {
+  constructor (Context: CoaContextConstructor<T>, env?: CoaEnv, config?: Partial<CoaHttpConfig>) {
     this.env = env || new CoaEnv('1.0.0')
-    this.config = Object.assign({ routeDir: 'gateway' }, config) as CoaHttp.Config
+    this.config = Object.assign({ routeDir: 'gateway' }, config) as CoaHttpConfig
     this.router = new CoaRouter<T>(this.config)
     this.application = new CoaApplication<T>(Context, this.router)
   }
 
   async start () {
-
     // 注册系统默认路由
     this.registerSystemRoute()
 
@@ -39,7 +35,7 @@ export class CoaHttp<T extends CoaContext> {
   }
 
   // 注册路由
-  register (name: string, routes: CoaRouter.Routes<T>) {
+  register (name: string, routes: CoaRouterRoutes<T>) {
     this.router.register(name, routes)
   }
 

@@ -4,43 +4,38 @@ import { promises as fs } from 'fs'
 import * as path from 'path'
 import * as querystring from 'querystring'
 
-export namespace CoaRouter {
-  export type Options = {
-    name?: string,
-    desc?: string,
-    method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
-    param?: { [i: string]: any },
-    result?: { [i: string]: any },
-    delete?: boolean,
-    legacy?: string,
-    access?: string
-  }
-  export type Handler<T> = (ctx: T) => Promise<object | string | undefined>
-  export type Routes<T> = { [path: string]: { options: Options, handler: Handler<T> } }
-  export type Layer<T> = { group: string, tag: string, method: string, path: string, options: Options, handler: CoaRouter.Handler<T> }
-  export type Layers<T> = { [pathname: string]: Layer<T> }
-  export type Tags = { [tag: string]: string }
-  export type SwaggerConfigs = { [group: string]: any }
-  export interface Config {
-    baseUrl: string
-  }
+export interface CoaRouterOptions {
+  name?: string
+  desc?: string
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+  param?: { [i: string]: any }
+  result?: { [i: string]: any }
+  delete?: boolean
+  legacy?: string
+  access?: string
 }
+export type CoaRouterHandler<T> = (ctx: T) => Promise<object | string | undefined>
+export interface CoaRouterRoutes<T> { [path: string]: { options: CoaRouterOptions, handler: CoaRouterHandler<T> } }
+export interface CoaRouterLayer<T> { group: string, tag: string, method: string, path: string, options: CoaRouterOptions, handler: CoaRouterHandler<T> }
+export interface CoaRouterLayers<T> { [pathname: string]: CoaRouterLayer<T> }
+export interface CoaRouterTags { [tag: string]: string }
+export interface CoaRouterSwaggerConfigs { [group: string]: any }
+export interface CoaRouterConfig {baseUrl: string}
 
 export class CoaRouter<T> {
-
-  public readonly layers: CoaRouter.Layers<T> = {}
-  public readonly tags: CoaRouter.Tags = {}
-  public readonly configs: CoaRouter.SwaggerConfigs = {}
+  public readonly layers: CoaRouterLayers<T> = {}
+  public readonly tags: CoaRouterTags = {}
+  public readonly configs: CoaRouterSwaggerConfigs = {}
 
   private readonly DATA = { group: '', tag: '' }
-  private readonly config: CoaRouter.Config
+  private readonly config: CoaRouterConfig
 
-  constructor (config: CoaRouter.Config) {
+  constructor (config: CoaRouterConfig) {
     this.config = Object.assign({ baseUrl: '/api/' }, config)
   }
 
   // 注册一批路由
-  register (name: string, routes: CoaRouter.Routes<T>) {
+  register (name: string, routes: CoaRouterRoutes<T>) {
     this.tags[this.DATA.tag] = name
     Object.keys(routes).forEach(path => {
       const { options, handler } = routes[path] || {}
@@ -74,15 +69,14 @@ export class CoaRouter<T> {
   }
 
   // 新增一个路由
-  on (method: string, path: string, handler: CoaRouter.Handler<T>, options: CoaRouter.Options = {}) {
+  on (method: string, path: string, handler: CoaRouterHandler<T>, options: CoaRouterOptions = {}) {
     const { group, tag } = this.DATA
     this.layers[path.toLowerCase()] = { group, tag, method, path, options, handler }
   }
 
   // 路由寻址
   lookup (method: string = '', url: string = '') {
-
-    const params = { query: {} as { [key: string]: string }, path: [] as string[] }
+    const params: { query: { [key: string]: string }, path: string[]} = { query: {}, path: [] }
 
     const urls = url.split('?')
     const path = urls[0].toLowerCase() || ''
@@ -92,7 +86,7 @@ export class CoaRouter<T> {
     // 如果全匹配的结果不存在，则尝试匹配通配符
     if (!layer) {
       // 目前仅支持以*结尾的通配符
-      const path2 = path.replace(/([/.])(\w+)$/, (str, $1, $2) => {
+      const path2 = path.replace(/([/.])(\w+)$/, (str, $1: string, $2: string) => {
         // 将path参数加入
         params.path.push($2)
         return $1 + '*'
@@ -106,8 +100,7 @@ export class CoaRouter<T> {
     const group = layer.group
 
     // 解析query参数
-    if (urls[1])
-      params.query = querystring.parse(urls[1]) as { [key: string]: string }
+    if (urls[1]) { params.query = querystring.parse(urls[1]) as { [key: string]: string } }
 
     return { handler, params, group }
   }
@@ -116,5 +109,4 @@ export class CoaRouter<T> {
     this.DATA.group = _.startCase(group)
     this.DATA.tag = _.startCase(tag.replace(/^a/, ''))
   }
-
 }

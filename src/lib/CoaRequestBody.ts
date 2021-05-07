@@ -1,11 +1,16 @@
 import { CoaError } from 'coa-error'
+import { _ } from 'coa-helper'
 import { IncomingMessage } from 'http'
 
 const DefaultMaxBodySize = 10 * 1024 * 1024
 
-export class CoaRequestBody {
+interface RequestBodyParams{
+  rawBody: string
+  body: { [key: string]: any}
+}
 
-  private req: IncomingMessage
+export class CoaRequestBody {
+  private readonly req: IncomingMessage
   private readonly maxBodySize: number
 
   constructor (req: IncomingMessage, maxBodySize = DefaultMaxBodySize) {
@@ -14,13 +19,11 @@ export class CoaRequestBody {
   }
 
   async get () {
-
-    const params = { rawBody: '' as string, body: {} as { [key: string]: any } }
+    const params: RequestBodyParams = { rawBody: '', body: {} }
 
     const contentLength = parseInt(this.req.headers['content-length'] || '') || 0
 
-    if (contentLength < 1)
-      return params
+    if (contentLength < 1) { return params }
 
     // 预判断大小
     if (contentLength > this.maxBodySize * 2) {
@@ -50,24 +53,21 @@ export class CoaRequestBody {
     return params
   }
 
-  protected getRawBody (contentLength: number) {
-
-    return new Promise<string>((resolve, reject) => {
-
-      let raw = [] as any[], received = 0, destroy = false
+  protected async getRawBody (contentLength: number) {
+    return await new Promise<string>((resolve, reject) => {
+      let raw = [] as Buffer[]; let received = 0; let destroy = false
 
       const onAborted = () => {
         // console.log('onAborted')
         reject(new CoaError('Gateway.BodyDataAborted', '网关数据传输异常终止'))
       }
 
-      const onError = (err: Error) => {
+      const onError = (err: any) => {
         // console.log('onError')
-        reject(new CoaError('Gateway.BodyDataError', '网关数据传输错误:' + err.toString()))
+        reject(new CoaError('Gateway.BodyDataError', '网关数据传输错误:' + _.toString(err)))
       }
 
-      const onData = (data: any) => {
-
+      const onData = (data: Buffer) => {
         // console.log('onData', data.length, complete, destroy)
 
         received += data.length
@@ -108,8 +108,6 @@ export class CoaRequestBody {
       this.req.addListener('data', onData)
       this.req.addListener('end', onEnd)
       this.req.addListener('error', onError)
-
     })
   }
-
 }

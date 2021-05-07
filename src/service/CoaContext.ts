@@ -1,12 +1,16 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { CoaSession } from '../lib/CoaSession'
 
-export namespace CoaContext {
-  export type Constructor<T> = new (req: IncomingMessage, res: ServerResponse) => T
+export type CoaContextConstructor<T> = new (req: IncomingMessage, res: ServerResponse) => T
+
+interface ConaContextRequest{
+  rawBody: string
+  query: { [key: string]: string }
+  body: { [key: string]: any }
+  path: string[]
 }
 
 export class CoaContext {
-
   // 原生请求
   public readonly req: IncomingMessage
   // 原生响应
@@ -28,12 +32,7 @@ export class CoaContext {
   }
 
   // 请求的参数等信息
-  public readonly request = {
-    rawBody: '' as string,
-    query: {} as { [key: string]: string },
-    body: {} as { [key: string]: any },
-    path: [] as string[]
-  }
+  public readonly request: ConaContextRequest = { rawBody: '', query: {}, body: {}, path: [] }
 
   // 缓存的session信息
   private cacheSessions: { [name: string]: CoaSession } = {}
@@ -51,15 +50,14 @@ export class CoaContext {
 
   // 获取host信息，支持主流cdn
   get host () {
-    const host = this.req.headers['ali-swift-stat-host'] || this.req.headers['x-forwarded-host'] || this.req.headers['host'] || ''
+    const host = this.req.headers['ali-swift-stat-host'] || this.req.headers['x-forwarded-host'] || this.req.headers.host || ''
     return host.toString().split(',', 1)[0].trim() || ''
   }
 
   // 根据session名称，获取session信息，支持各种类型的参数，包括 query body headers
   session (name: string) {
     name = name.toLowerCase()
-    if (!this.cacheSessions[name])
-      this.cacheSessions[name] = new CoaSession(this.get(name) || '')
+    if (!this.cacheSessions[name]) { this.cacheSessions[name] = new CoaSession(this.get(name) || '') }
     return this.cacheSessions[name]
   }
 
@@ -75,7 +73,7 @@ export class CoaContext {
   }
 
   // 设置为json格式结果
-  json (data: object) {
+  json (data: any) {
     this.response.contentType = 'application/json; charset=utf-8'
     this.response.body = JSON.stringify(data)
   }
@@ -85,5 +83,4 @@ export class CoaContext {
     this.response.respond = false
     return undefined
   }
-
 }
