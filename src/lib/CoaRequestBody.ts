@@ -4,7 +4,7 @@ import { IncomingMessage } from 'http'
 
 const DefaultMaxBodySize = 10 * 1024 * 1024
 
-interface RequestBodyParams{
+interface RequestBodyParams {
   rawBody: string
   body: { [key: string]: any}
 }
@@ -55,7 +55,9 @@ export class CoaRequestBody {
 
   protected async getRawBody (contentLength: number) {
     return await new Promise<string>((resolve, reject) => {
-      let raw = [] as Buffer[]; let received = 0; let destroy = false
+      let raw = [] as Buffer[]
+      let received = 0
+      let destroy = false
 
       const onAborted = () => {
         // console.log('onAborted')

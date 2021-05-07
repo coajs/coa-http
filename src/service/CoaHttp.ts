@@ -5,7 +5,7 @@ import { CoaApplication } from './CoaApplication'
 import { CoaContext, CoaContextConstructor } from './CoaContext'
 import { CoaRouter, CoaRouterConfig, CoaRouterRoutes } from './CoaRouter'
 
-interface CoaHttpConfig extends CoaRouterConfig, CoaSwaggerConfig{
+interface CoaHttpConfig extends CoaRouterConfig, CoaSwaggerConfig {
   routeDir: string
 }
 
