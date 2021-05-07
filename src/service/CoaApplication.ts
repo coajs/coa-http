@@ -16,7 +16,7 @@ export class CoaApplication<T extends CoaContext> {
     echo.info('[server] Booting...')
   }
 
-  async start (entry: string = ''): Promise<void> {
+  async start (entry: string = '') {
     // 设置端口
     const port = parseInt(process.env.HOST || '') || 8000
 
@@ -29,7 +29,7 @@ export class CoaApplication<T extends CoaContext> {
   }
 
   // 监听请求
-  private async requestListener (req: IncomingMessage, res: ServerResponse): Promise<void> {
+  private async requestListener (req: IncomingMessage, res: ServerResponse) {
     const ctx = new this.Context(req, res)
 
     try {
