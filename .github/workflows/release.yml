@@ -27,23 +27,23 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Yarn
-        run: yarn
+        run: |
+          yarn
 
       - name: Lint
-        run: yarn lint
+        run: |
+          yarn lint
 
       - name: Build
         run: |
-          yarn
-          npm --no-git-tag-version version ${{ github.event.release.tag_name }}
+          yarn version --no-git-tag-version --new-version ${{ github.event.release.tag_name }}
           yarn build
 
       - name: Publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.AEX_NPM_TOKEN }}
         run: |
-          cd dist
-          npm publish
+          yarn publish dist
 
       - name: Sync
         run: |
