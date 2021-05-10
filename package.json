@@ -20,8 +20,7 @@
     "dev": "tsc -w",
     "build": "rm -rf dist && tsc && cp package.json *.md dist",
     "sync": "curl -X PUT 'https://npm.taobao.org/sync/coa-http?sync_upstream=true'",
-    "lint": "eslint .",
-    "publish-prerelease": "yarn build && yarn version --prerelease && cp package.json *.md dist && cd dist && npm publish"
+    "lint": "eslint ."
   },
   "dependencies": {
     "coa-echo": "^1.0.8",
