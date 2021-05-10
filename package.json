@@ -26,14 +26,14 @@
   "dependencies": {
     "coa-echo": "^1.0.8",
     "coa-env": "^1.1.1",
-    "coa-error": "^1.1.3",
+    "coa-error": "^1.5.2",
     "coa-helper": "^1.1.1",
     "coa-secure": "^1.1.2"
   },
   "devDependencies": {
-    "@types/node": "^14.14.41",
+    "@types/node": "^15.0.2",
     "@typescript-eslint/eslint-plugin": "^4.22.1",
-    "eslint": "^7.25.0",
+    "eslint": "^7.26.0",
     "eslint-config-standard-with-typescript": "^20.0.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
