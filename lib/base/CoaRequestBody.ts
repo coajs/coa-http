@@ -8,6 +8,13 @@ const DefaultMaxBodySize = 10 * 1024 * 1024
 interface RequestBodyParams {
   rawBody: string
   body: { [key: string]: any}
+  files: RequestBodyFile[]
+}
+interface RequestBodyFile {
+  data: any
+  key: string
+  filename: string
+  type: string
 }
 
 export class CoaRequestBody {
@@ -20,7 +27,7 @@ export class CoaRequestBody {
   }
 
   async get () {
-    const params: RequestBodyParams = { rawBody: '', body: {} }
+    const params: RequestBodyParams = { rawBody: '', body: {}, files: [] }
 
     const contentLength = parseInt(this.req.headers['content-length'] || '') || 0
 
@@ -57,6 +64,35 @@ export class CoaRequestBody {
         params.body = querystring.parse(params.rawBody)
       } catch (e) {
         throw new CoaError('Gateway.BodyDataParseError', '网关数据解析form-urlencoded参数失败')
+      }
+    }
+
+    // 处理 multipart/form-data
+    else if (contentType.includes('multipart/form-data')) {
+      try {
+        // 获取分隔符
+        const boundary = contentType.split('boundary=')[1]
+        if (!boundary) {
+          throw new CoaError('Gateway.BodyDataParseError', '网关数据解析form-data参数boundary失败')
+        }
+        // 分割每个参数
+        const rawDataArray = params.rawBody.split(boundary)
+        for (const item of rawDataArray) {
+          // 匹配结果
+          const name = this.matching(item, /(?:name=")(.+?)(?:")/, true)
+          const value = this.matching(item, /(?:\r\n\r\n)([\S\s]*)(?:\r\n--$)/)
+          if (!name || !value) continue
+          // 尝试获取文件名
+          const filename = this.matching(item, /(?:filename=")(.*?)(?:")/, true)
+          if (filename) {
+            const type = this.matching(item, /(?:Content-Type:)(.*?)(?:\r\n)/, true)
+            params.files.push({ data: value, key: name, filename, type })
+          } else {
+            params.body[name] = value
+          }
+        }
+      } catch (e) {
+        throw new CoaError('Gateway.BodyDataParseError', '网关数据解析form-data参数失败')
       }
     }
 
@@ -121,5 +157,12 @@ export class CoaRequestBody {
       this.req.addListener('end', onEnd)
       this.req.addListener('error', onError)
     })
+  }
+
+  private matching (string: string, regex: RegExp, trim = false) {
+    const matches = string.match(regex)
+    if (!matches || matches.length < 2) { return '' }
+    const value = matches[1]
+    return trim ? value.trim() : value
   }
 }
