@@ -54,6 +54,13 @@ export class CoaContext {
     return host.toString().split(',', 1)[0].trim() || ''
   }
 
+  // 获取真实ip地址
+  get realIp () {
+    const headers = this.req.headers
+    const ips = headers['ali-cdn-real-ip'] || headers['x-original-forwarded-for'] || headers['x-real-ip'] || headers['x-forwarded-for'] || ''
+    return ips.toString().split(',', 1)[0].trim()
+  }
+
   // 根据session名称，获取session信息，支持各种类型的参数，包括 query body headers
   session (name: string) {
     name = name.toLowerCase()
