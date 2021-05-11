@@ -1,6 +1,7 @@
 import { CoaError } from 'coa-error'
 import { _ } from 'coa-helper'
 import { IncomingMessage } from 'http'
+import * as querystring from 'querystring'
 
 const DefaultMaxBodySize = 10 * 1024 * 1024
 
@@ -41,12 +42,21 @@ export class CoaRequestBody {
     // 判断类型
     const contentType = this.req.headers['content-type'] || ''
 
-    // 处理json
+    // 处理 json
     if (contentType.includes('application/json')) {
       try {
         params.body = JSON.parse(params.rawBody)
       } catch (e) {
         throw new CoaError('Gateway.BodyDataParseError', '网关数据解析JSON失败')
+      }
+    }
+
+    // 处理 x-www-form-urlencoded
+    else if (contentType.includes('application/x-www-form-urlencoded')) {
+      try {
+        params.body = querystring.parse(params.rawBody)
+      } catch (e) {
+        throw new CoaError('Gateway.BodyDataParseError', '网关数据解析form-urlencoded参数失败')
       }
     }
 
