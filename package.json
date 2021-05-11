@@ -18,6 +18,7 @@
   },
   "scripts": {
     "dev": "tsc -w",
+    "example": "cd dist/example && node gateway",
     "build": "rm -rf dist && tsc && cp package.json *.md dist/lib",
     "sync": "curl -X PUT 'https://npm.taobao.org/sync/coa-http?sync_upstream=true'",
     "lint": "eslint ."
