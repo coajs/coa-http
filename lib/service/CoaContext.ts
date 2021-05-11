@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'http'
-import { CoaSession } from '../lib/CoaSession'
+import { CoaSession } from '../base/CoaSession'
 
 export type CoaContextConstructor<T> = new (req: IncomingMessage, res: ServerResponse) => T
 

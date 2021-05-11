@@ -18,7 +18,7 @@
   },
   "scripts": {
     "dev": "tsc -w",
-    "build": "rm -rf dist && tsc && cp package.json *.md dist",
+    "build": "rm -rf dist && tsc && cp package.json *.md dist/lib",
     "sync": "curl -X PUT 'https://npm.taobao.org/sync/coa-http?sync_upstream=true'",
     "lint": "eslint ."
   },
@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "@types/node": "^15.0.2",
-    "@typescript-eslint/eslint-plugin": "^4.22.1",
+    "@typescript-eslint/eslint-plugin": "^4.23.0",
     "eslint": "^7.26.0",
     "eslint-config-standard-with-typescript": "^20.0.0",
     "eslint-plugin-import": "^2.22.1",

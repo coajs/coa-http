@@ -43,7 +43,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.AEX_NPM_TOKEN }}
         run: |
-          yarn publish dist
+          yarn publish dist/lib
 
       - name: Sync
         run: |

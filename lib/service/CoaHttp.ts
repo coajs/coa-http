@@ -1,6 +1,6 @@
 import { CoaEnv } from 'coa-env'
-import { CoaSwagger, CoaSwaggerConfig } from '../lib/CoaSwagger'
-import { CoaSwaggerCode } from '../lib/CoaSwaggerCode'
+import { CoaSwagger, CoaSwaggerConfig } from '../base/CoaSwagger'
+import { CoaSwaggerCode } from '../base/CoaSwaggerCode'
 import { CoaApplication } from './CoaApplication'
 import { CoaContext, CoaContextConstructor } from './CoaContext'
 import { CoaRouter, CoaRouterConfig, CoaRouterRoutes } from './CoaRouter'

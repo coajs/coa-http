@@ -1,7 +1,7 @@
 import { echo } from 'coa-echo'
 import { _ } from 'coa-helper'
 import { createServer, IncomingMessage, ServerResponse } from 'http'
-import { CoaRequestBody } from '../lib/CoaRequestBody'
+import { CoaRequestBody } from '../base/CoaRequestBody'
 import { CoaContext, CoaContextConstructor } from './CoaContext'
 import { CoaRouter } from './CoaRouter'
 
