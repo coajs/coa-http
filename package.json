@@ -17,8 +17,8 @@
     "url": "https://github.com/coajs/coa-http.git"
   },
   "scripts": {
-    "dev": "tsc -w",
-    "example": "cd dist/example && node gateway",
+    "tsc": "tsc -w",
+    "dev": "NODE_PATH=dist/example tsc-watch --onSuccess 'node dist/example/gateway'",
     "build": "rm -rf dist && tsc && cp package.json *.md dist/lib",
     "sync": "curl -X PUT 'https://npm.taobao.org/sync/coa-http?sync_upstream=true'",
     "lint": "eslint ."
@@ -38,6 +38,7 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
+    "tsc-watch": "^4.2.9",
     "typescript": "^4.2.4"
   }
 }
