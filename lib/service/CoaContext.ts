@@ -1,13 +1,12 @@
 import { IncomingMessage, ServerResponse } from 'http'
+import { CoaRequestBodyParams } from '../base/CoaRequestBody'
 import { CoaSession } from '../base/CoaSession'
 
 export type CoaContextConstructor<T> = new (req: IncomingMessage, res: ServerResponse) => T
 
-interface ConaContextRequest{
-  rawBody: string
-  query: { [key: string]: string }
-  body: { [key: string]: any }
+interface CoaContextRequest extends CoaRequestBodyParams{
   path: string[]
+  query: { [key: string]: string }
 }
 
 export class CoaContext {
@@ -32,7 +31,7 @@ export class CoaContext {
   }
 
   // 请求的参数等信息
-  public readonly request: ConaContextRequest = { rawBody: '', query: {}, body: {}, path: [] }
+  public readonly request: CoaContextRequest = { rawBody: Buffer.from([]), path: [], query: {}, body: {}, file: {} }
 
   // 缓存的session信息
   private cacheSessions: { [name: string]: CoaSession } = {}

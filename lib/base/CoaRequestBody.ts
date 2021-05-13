@@ -5,14 +5,13 @@ import * as querystring from 'querystring'
 
 const DefaultMaxBodySize = 10 * 1024 * 1024
 
-interface RequestBodyParams {
-  rawBody: string
+export interface CoaRequestBodyParams {
+  rawBody: Buffer
   body: { [key: string]: any}
-  files: RequestBodyFile[]
+  file: { [key: string]: CoaRequestBodyFile }
 }
-interface RequestBodyFile {
-  data: any
-  key: string
+interface CoaRequestBodyFile {
+  data: Buffer
   filename: string
   type: string
 }
@@ -27,7 +26,7 @@ export class CoaRequestBody {
   }
 
   async get () {
-    const params: RequestBodyParams = { rawBody: '', body: {}, files: [] }
+    const params: CoaRequestBodyParams = { rawBody: Buffer.from([]), body: {}, file: {} }
 
     const contentLength = parseInt(this.req.headers['content-length'] || '') || 0
 
@@ -52,7 +51,7 @@ export class CoaRequestBody {
     // 处理 json
     if (contentType.includes('application/json')) {
       try {
-        params.body = JSON.parse(params.rawBody)
+        params.body = JSON.parse(params.rawBody.toString())
       } catch (e) {
         throw new CoaError('Gateway.BodyDataParseError', '网关数据解析JSON失败')
       }
@@ -61,7 +60,7 @@ export class CoaRequestBody {
     // 处理 x-www-form-urlencoded
     else if (contentType.includes('application/x-www-form-urlencoded')) {
       try {
-        params.body = querystring.parse(params.rawBody)
+        params.body = querystring.parse(params.rawBody.toString())
       } catch (e) {
         throw new CoaError('Gateway.BodyDataParseError', '网关数据解析form-urlencoded参数失败')
       }
@@ -76,17 +75,17 @@ export class CoaRequestBody {
           throw new CoaError('Gateway.BodyDataParseError', '网关数据解析form-data参数boundary失败')
         }
         // 分割每个参数
-        const rawDataArray = params.rawBody.split(boundary)
+        const rawDataArray = params.rawBody.toString('binary').split(boundary)
         for (const item of rawDataArray) {
           // 匹配结果
-          const name = this.matching(item, /(?:name=")(.+?)(?:")/, true)
-          const value = this.matching(item, /(?:\r\n\r\n)([\S\s]*)(?:\r\n--$)/)
+          const name = this.matching(item, /(?:name=")(.*?)(?:")/, 'utf-8')
+          const value = this.matching(item, /(?:\r\n\r\n)([\S\s]*)(?:\r\n--$)/, 'binary')
           if (!name || !value) continue
           // 尝试获取文件名
-          const filename = this.matching(item, /(?:filename=")(.*?)(?:")/, true)
+          const filename = this.matching(item, /(?:filename=")(.*?)(?:")/, 'utf-8')
           if (filename) {
-            const type = this.matching(item, /(?:Content-Type:)(.*?)(?:\r\n)/, true)
-            params.files.push({ data: value, key: name, filename, type })
+            const type = this.matching(item, /(?:Content-Type:)(.*?)(?:\r\n)/, 'utf-8')
+            params.file[name] = { data: Buffer.from(value, 'binary'), filename, type }
           } else {
             params.body[name] = value
           }
@@ -100,8 +99,8 @@ export class CoaRequestBody {
   }
 
   protected async getRawBody (contentLength: number) {
-    return await new Promise<string>((resolve, reject) => {
-      let raw = [] as Buffer[]
+    return await new Promise<Buffer>((resolve, reject) => {
+      let raw = Buffer.from([])
       let received = 0
       let destroy = false
 
@@ -129,7 +128,7 @@ export class CoaRequestBody {
           return
         }
 
-        raw.push(data)
+        raw = Buffer.concat([raw, data])
       }
 
       const onEnd = () => {
@@ -138,7 +137,7 @@ export class CoaRequestBody {
           reject(new CoaError('Gateway.BodyDataContentError', '网关数据大小不符'))
           return
         }
-        resolve(raw.toString())
+        resolve(raw)
       }
 
       const onClose = () => {
@@ -159,10 +158,10 @@ export class CoaRequestBody {
     })
   }
 
-  private matching (string: string, regex: RegExp, trim = false) {
+  private matching (string: string, regex: RegExp, encode: BufferEncoding) {
     const matches = string.match(regex)
     if (!matches || matches.length < 2) { return '' }
     const value = matches[1]
-    return trim ? value.trim() : value
+    return encode === 'binary' ? value : Buffer.from(value, 'binary').toString(encode).trim()
   }
 }
