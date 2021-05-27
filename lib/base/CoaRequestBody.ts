@@ -7,7 +7,7 @@ const DefaultMaxBodySize = 10 * 1024 * 1024
 
 export interface CoaRequestBodyParams {
   rawBody: Buffer
-  body: { [key: string]: any}
+  body: { [key: string]: any }
   file: { [key: string]: CoaRequestBodyFile }
 }
 interface CoaRequestBodyFile {
@@ -20,17 +20,19 @@ export class CoaRequestBody {
   private readonly req: IncomingMessage
   private readonly maxBodySize: number
 
-  constructor (req: IncomingMessage, maxBodySize = DefaultMaxBodySize) {
+  constructor(req: IncomingMessage, maxBodySize = DefaultMaxBodySize) {
     this.req = req
     this.maxBodySize = maxBodySize
   }
 
-  async get () {
+  async get() {
     const params: CoaRequestBodyParams = { rawBody: Buffer.from([]), body: {}, file: {} }
 
     const contentLength = parseInt(this.req.headers['content-length'] || '') || 0
 
-    if (contentLength < 1) { return params }
+    if (contentLength < 1) {
+      return params
+    }
 
     // 预判断大小
     if (contentLength > this.maxBodySize * 2) {
@@ -98,7 +100,7 @@ export class CoaRequestBody {
     return params
   }
 
-  protected async getRawBody (contentLength: number) {
+  protected async getRawBody(contentLength: number) {
     return await new Promise<Buffer>((resolve, reject) => {
       let raw = Buffer.from([])
       let received = 0
@@ -158,9 +160,11 @@ export class CoaRequestBody {
     })
   }
 
-  private matching (string: string, regex: RegExp, encode: BufferEncoding) {
+  private matching(string: string, regex: RegExp, encode: BufferEncoding) {
     const matches = string.match(regex)
-    if (!matches || matches.length < 2) { return '' }
+    if (!matches || matches.length < 2) {
+      return ''
+    }
     const value = matches[1]
     return encode === 'binary' ? value : Buffer.from(value, 'binary').toString(encode).trim()
   }

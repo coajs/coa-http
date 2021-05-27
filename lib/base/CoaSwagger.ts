@@ -11,36 +11,38 @@ export class CoaSwagger {
     openapi: '3.0.0',
     info: {
       title: '后端接口文档',
-      version: ''
+      version: '',
       // description: '',
     },
     externalDocs: {
       description: '→ 点击此处，自动生成接口代码',
-      url: ''
+      url: '',
     },
-    servers: [{
-      description: 'Gateway',
-      url: ''
-    }],
+    servers: [
+      {
+        description: 'Gateway',
+        url: '',
+      },
+    ],
     paths: {} as any,
     tags: {} as any,
     components: {
       securitySchemes: {
         userAccess: { type: 'apiKey', in: 'header', name: 'access' },
-        managerAccess: { type: 'apiKey', in: 'header', name: 'passport' }
-      }
-    }
+        managerAccess: { type: 'apiKey', in: 'header', name: 'passport' },
+      },
+    },
   }
 
   private readonly router: CoaRouter<any>
   private readonly config: CoaSwaggerConfig
 
-  constructor (router: CoaRouter<any>, config: CoaSwaggerConfig) {
+  constructor(router: CoaRouter<any>, config: CoaSwaggerConfig) {
     this.router = router
     this.config = Object.assign({ swaggerFilter: false, swaggerDocExpansion: 'list' }, config)
   }
 
-  getData (matchGroup: string, serverUrl: string, codeUrl: string, version: string) {
+  getData(matchGroup: string, serverUrl: string, codeUrl: string, version: string) {
     matchGroup = _.startCase(matchGroup)
 
     // 当前配置
@@ -59,7 +61,7 @@ export class CoaSwagger {
       this.data.paths[path][method] = this.getOneAction(tag, method, path, options, security)
     })
     // 处理tag
-    this.data.tags = Object.keys(this.data.tags).map(name => ({ name, description: this.router.tags[name] || '' }))
+    this.data.tags = Object.keys(this.data.tags).map((name) => ({ name, description: this.router.tags[name] || '' }))
     // 处理server
     this.data.servers[0].url = serverUrl
     // 处理代码链接
@@ -73,18 +75,18 @@ export class CoaSwagger {
     return this.data
   }
 
-  getHtml (dataUrl: string, group: string = '') {
+  getHtml(dataUrl: string, group: string = '') {
     const groups = {} as any
     _.forEach(this.router.layers, ({ group }) => {
       if (group && !groups[group]) groups[group] = true
     })
     if (group.length) group = _.startCase(group)
     const groupNames = group.length && groups[group] ? [group] : Object.keys(groups)
-    const urls = groupNames.map(name => ({ name, url: dataUrl + _.snakeCase(name) }))
+    const urls = groupNames.map((name) => ({ name, url: dataUrl + _.snakeCase(name) }))
     return getHtml(urls, this.config)
   }
 
-  private getOneAction (tag: string, method: string, path: string, opt: any, security: string[]) {
+  private getOneAction(tag: string, method: string, path: string, opt: any, security: string[]) {
     opt = _.defaults(opt, {
       name: '',
       desc: '',
@@ -94,7 +96,7 @@ export class CoaSwagger {
       param: {},
       result: {},
       delete: false,
-      access: true
+      access: true,
     })
 
     // 预处理
@@ -105,24 +107,28 @@ export class CoaSwagger {
       parameters: [] as object[],
       requestBody: {
         content: {
-          'application/json': {}
-        }
+          'application/json': {},
+        },
       },
       responses: {
         default: {
           description: 'OK',
           content: {
-            'application/json': {}
-          }
-        }
+            'application/json': {},
+          },
+        },
       },
       deprecated: opt.delete,
-      security: [] as any[]
+      security: [] as any[],
     }
 
     // 处理param参数
     if (!_.isEmpty(opt.param)) {
-      if (method === 'get') { opt.query = _.extend(opt.param, opt.query) } else { opt.body = _.extend(opt.param, opt.body) }
+      if (method === 'get') {
+        opt.query = _.extend(opt.param, opt.query)
+      } else {
+        opt.body = _.extend(opt.param, opt.body)
+      }
     }
     if (!opt.path.id && path.endsWith(':id')) {
       opt.path.id = { required: true, description: 'ID', example: '' }
@@ -136,7 +142,7 @@ export class CoaSwagger {
         required: !!v.required,
         description: v.desc || v.description || '',
         example: v.example || '',
-        schema: { type: v.type || typeof v.example }
+        schema: { type: v.type || typeof v.example },
       })
     })
 
@@ -148,7 +154,7 @@ export class CoaSwagger {
         required: !!v.required,
         description: v.desc || v.description || '',
         example: v.example || '',
-        schema: { type: v.type || typeof v.example }
+        schema: { type: v.type || typeof v.example },
       })
     })
 
@@ -166,19 +172,19 @@ export class CoaSwagger {
 
     // 处理Access
     if (opt.access) {
-      doc.security = security.map(item => ({ [item]: [] }))
+      doc.security = security.map((item) => ({ [item]: [] }))
     }
 
     return doc
   }
 
-  private getSchema (data: any) {
+  private getSchema(data: any) {
     const schema = { type: 'object', properties: {} as any, required: [] as string[] }
     _.forEach(data, (v: any, k: string) => {
       schema.properties[k] = {
         description: v.desc || v.description,
         type: typeof v.example,
-        example: v.example
+        example: v.example,
       }
       if (v.data) {
         const subSchema = this.getSchema(v.data)

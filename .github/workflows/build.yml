@@ -12,9 +12,7 @@ on:
       - '**'
 
 jobs:
-
   build-check:
-
     name: Build check
 
     runs-on: ubuntu-latest

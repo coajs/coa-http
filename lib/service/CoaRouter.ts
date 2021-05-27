@@ -15,12 +15,29 @@ export interface CoaRouterOptions {
   access?: string
 }
 export type CoaRouterHandler<T> = (ctx: T) => Promise<object | string | undefined>
-export interface CoaRouterRoutes<T> { [path: string]: { options: CoaRouterOptions, handler: CoaRouterHandler<T> } }
-export interface CoaRouterLayer<T> { group: string, tag: string, method: string, path: string, options: CoaRouterOptions, handler: CoaRouterHandler<T> }
-export interface CoaRouterLayers<T> { [pathname: string]: CoaRouterLayer<T> }
-export interface CoaRouterTags { [tag: string]: string }
-export interface CoaRouterSwaggerConfigs { [group: string]: any }
-export interface CoaRouterConfig {baseUrl: string}
+export interface CoaRouterRoutes<T> {
+  [path: string]: { options: CoaRouterOptions; handler: CoaRouterHandler<T> }
+}
+export interface CoaRouterLayer<T> {
+  group: string
+  tag: string
+  method: string
+  path: string
+  options: CoaRouterOptions
+  handler: CoaRouterHandler<T>
+}
+export interface CoaRouterLayers<T> {
+  [pathname: string]: CoaRouterLayer<T>
+}
+export interface CoaRouterTags {
+  [tag: string]: string
+}
+export interface CoaRouterSwaggerConfigs {
+  [group: string]: any
+}
+export interface CoaRouterConfig {
+  baseUrl: string
+}
 
 export class CoaRouter<T> {
   public readonly layers: CoaRouterLayers<T> = {}
@@ -30,14 +47,14 @@ export class CoaRouter<T> {
   private readonly DATA = { group: '', tag: '' }
   private readonly config: CoaRouterConfig
 
-  constructor (config: CoaRouterConfig) {
+  constructor(config: CoaRouterConfig) {
     this.config = Object.assign({ baseUrl: '/api/' }, config)
   }
 
   // 注册一批路由
-  register (name: string, routes: CoaRouterRoutes<T>) {
+  register(name: string, routes: CoaRouterRoutes<T>) {
     this.tags[this.DATA.tag] = name
-    Object.keys(routes).forEach(path => {
+    Object.keys(routes).forEach((path) => {
       const { options, handler } = routes[path] || {}
       const { method, name } = options
       if (!(path && method && name && handler)) return
@@ -47,13 +64,13 @@ export class CoaRouter<T> {
   }
 
   // 设置当前组的路由配置
-  setSwaggerConfig (config: any) {
+  setSwaggerConfig(config: any) {
     const { group } = this.DATA
     this.configs[group] = config
   }
 
   // 扫描并注入路由文件
-  async registerDir (dir: string) {
+  async registerDir(dir: string) {
     dir = path.resolve(process.env.NODE_PATH || '', dir)
     const groups = await fs.readdir(dir, { withFileTypes: true })
     for (const group of groups) {
@@ -69,14 +86,14 @@ export class CoaRouter<T> {
   }
 
   // 新增一个路由
-  on (method: string, path: string, handler: CoaRouterHandler<T>, options: CoaRouterOptions = {}) {
+  on(method: string, path: string, handler: CoaRouterHandler<T>, options: CoaRouterOptions = {}) {
     const { group, tag } = this.DATA
     this.layers[path.toLowerCase()] = { group, tag, method, path, options, handler }
   }
 
   // 路由寻址
-  lookup (method: string = '', url: string = '') {
-    const params: { query: { [key: string]: string }, path: string[]} = { query: {}, path: [] }
+  lookup(method: string = '', url: string = '') {
+    const params: { query: { [key: string]: string }; path: string[] } = { query: {}, path: [] }
 
     const urls = url.split('?')
     const path = urls[0].toLowerCase() || ''
@@ -100,12 +117,14 @@ export class CoaRouter<T> {
     const group = layer.group
 
     // 解析query参数
-    if (urls[1]) { params.query = querystring.parse(urls[1]) as { [key: string]: string } }
+    if (urls[1]) {
+      params.query = querystring.parse(urls[1]) as { [key: string]: string }
+    }
 
     return { handler, params, group }
   }
 
-  private group (group: string, tag: string) {
+  private group(group: string, tag: string) {
     this.DATA.group = _.startCase(group)
     this.DATA.tag = _.startCase(tag.replace(/^a/, ''))
   }

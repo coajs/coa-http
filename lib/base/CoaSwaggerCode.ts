@@ -4,11 +4,11 @@ import { CoaRouter } from '../service/CoaRouter'
 export class CoaSwaggerCode {
   private readonly router: CoaRouter<any>
 
-  constructor (router: CoaRouter<any>) {
+  constructor(router: CoaRouter<any>) {
     this.router = router
   }
 
-  getHtml (base: string, matchGroup: string) {
+  getHtml(base: string, matchGroup: string) {
     matchGroup = _.startCase(matchGroup)
 
     const layerTagMaps: { [tag: string]: string[] } = {}
@@ -29,8 +29,12 @@ export class CoaSwaggerCode {
     _.forEach(layerTagMaps, (paths, tag) => {
       code.newTag(tag, this.router.tags[tag])
 
-      _.forEach(paths, key => {
-        const { method, path, options: { name = '' } } = this.router.layers[key]
+      _.forEach(paths, (key) => {
+        const {
+          method,
+          path,
+          options: { name = '' },
+        } = this.router.layers[key]
         const action = path.replace(base, '').split(/[/.]/, 3).pop() || ''
         code.newApi(name, method, action, path)
       })
@@ -48,37 +52,39 @@ class Code {
   private readonly contents = [] as string[]
   private indent = ''
 
-  newGroup (group: string) {
+  newGroup(group: string) {
     this.newline(`export const ${_.camelCase(group)} = new class {`)
     this.newIndent()
   }
 
-  newTag (tag: string, name: string) {
+  newTag(tag: string, name: string) {
     this.newline()
     this.newline(`// ${_.startCase(tag)} ${name}`)
     this.newline(`${_.camelCase(tag)} = new class {`)
     this.newIndent()
   }
 
-  newApi (name: string, method: string, action: string, path: string) {
+  newApi(name: string, method: string, action: string, path: string) {
     this.newline(`// ${name}`)
-    this.newline(`${_.camelCase(action)} = (param?: Gateway.Param, option?: Gateway.Option) => gate.request('${method.toLowerCase()}', '${path.substr(1)}', param, option)`)
+    this.newline(
+      `${_.camelCase(action)} = (param?: Gateway.Param, option?: Gateway.Option) => gate.request('${method.toLowerCase()}', '${path.substr(1)}', param, option)`
+    )
   }
 
-  close () {
+  close() {
     this.newIndent('close')
     this.newline('}')
   }
 
-  toString () {
+  toString() {
     return this.contents.join('\n')
   }
 
-  private newline (content: string = '') {
+  private newline(content: string = '') {
     this.contents.push(content.length ? this.indent + content : '')
   }
 
-  private newIndent (mode: 'open' | 'close' = 'open') {
+  private newIndent(mode: 'open' | 'close' = 'open') {
     if (mode === 'open') this.indent += '  '
     else this.indent = this.indent.substr(0, this.indent.length - 2)
   }
