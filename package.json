@@ -25,10 +25,10 @@
     "prettier": "prettier -w ."
   },
   "dependencies": {
-    "coa-echo": "^1.1.0",
+    "coa-echo": "^1.1.1",
     "coa-env": "^1.1.1",
     "coa-error": "^1.5.2",
-    "coa-helper": "^1.1.1",
+    "coa-helper": "^1.2.1",
     "coa-secure": "^1.1.2"
   },
   "devDependencies": {
