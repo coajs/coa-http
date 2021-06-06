@@ -1,0 +1,12 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/main/containers/javascript-node
+{
+	"name": "coajs",
+	"image": "mcr.microsoft.com/vscode/devcontainers/javascript-node",
+	"extensions": [
+		"mutantdino.resourcemonitor",
+		"dbaeumer.vscode-eslint",
+		"esbenp.prettier-vscode",
+		"eamodio.gitlens",
+	],
+}
