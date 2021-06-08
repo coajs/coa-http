@@ -32,6 +32,8 @@ export class CoaHttp<T extends CoaContext> {
 
     // 启动应用
     await this.application.start(this.config.baseUrl + 'doc')
+
+    return { server: this.application.server }
   }
 
   // 注册路由

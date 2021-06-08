@@ -4,5 +4,5 @@
   "name": "coajs",
   "image": "mcr.microsoft.com/vscode/devcontainers/javascript-node",
   "postCreateCommand": "yarn",
-  "extensions": ["mutantdino.resourcemonitor", "esbenp.prettier-vscode", "dbaeumer.vscode-eslint", "eamodio.gitlens"]
+  "extensions": ["mutantdino.resourcemonitor", "esbenp.prettier-vscode", "dbaeumer.vscode-eslint"]
 }

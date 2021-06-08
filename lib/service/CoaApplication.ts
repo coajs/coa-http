@@ -1,19 +1,23 @@
 import { echo } from 'coa-echo'
 import { _ } from 'coa-helper'
-import { createServer, IncomingMessage, ServerResponse } from 'http'
+import { createServer, IncomingMessage, Server, ServerResponse } from 'http'
 import { CoaRequestBody } from '../base/CoaRequestBody'
 import { CoaContext, CoaContextConstructor } from './CoaContext'
 import { CoaRouter } from './CoaRouter'
 
 export class CoaApplication<T extends CoaContext> {
-  private readonly router: CoaRouter<T>
+  public readonly server: Server
+  public readonly router: CoaRouter<T>
   private readonly Context: CoaContextConstructor<T>
   private readonly startAt: bigint = process.hrtime.bigint()
 
   constructor(Context: CoaContextConstructor<T>, router: CoaRouter<T>) {
+    echo.info('[server] Booting...')
     this.Context = Context
     this.router = router
-    echo.info('[server] Booting...')
+    this.server = createServer((req, res) => {
+      this.requestListener(req, res).catch((e) => echo.error(e))
+    })
   }
 
   async start(entry: string = '') {
@@ -21,13 +25,7 @@ export class CoaApplication<T extends CoaContext> {
     const port = parseInt(process.env.HOST || '') || 8000
 
     // 启动服务
-    const server = createServer(
-      async (req, res) =>
-        await this.requestListener(req, res).catch((e) => {
-          echo.error(e)
-        })
-    )
-    server.listen(port, () => {
+    this.server.listen(port, () => {
       echo.info(`[server] Startup successful in: ${Number(process.hrtime.bigint() - this.startAt) / 1e6} ms`)
       echo.info(`[server] Listening on: http://localhost:${port}${entry}`)
     })
