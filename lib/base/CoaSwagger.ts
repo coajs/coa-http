@@ -4,7 +4,10 @@ import { CoaRouter } from '../service/CoaRouter'
 export interface CoaSwaggerConfig {
   swaggerFilter: boolean
   swaggerDocExpansion: 'full' | 'list' | 'none'
+  swaggerLibrarySite: string
 }
+
+const DEFAULT_LIBRARY_SITE = 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.51.1'
 
 export class CoaSwagger {
   private data = {
@@ -39,7 +42,8 @@ export class CoaSwagger {
 
   constructor(router: CoaRouter<any>, config: CoaSwaggerConfig) {
     this.router = router
-    this.config = Object.assign({ swaggerFilter: false, swaggerDocExpansion: 'list' }, config)
+    this.config = Object.assign({ swaggerFilter: false, swaggerDocExpansion: 'list', swaggerLibrarySite: DEFAULT_LIBRARY_SITE }, config)
+    this.config.swaggerLibrarySite = this.config.swaggerLibrarySite.replace(/\/+$/, '')
   }
 
   getData(matchGroup: string, serverUrl: string, codeUrl: string, version: string) {
@@ -203,9 +207,9 @@ const getHtml = (urls: object[], config: CoaSwaggerConfig) => `
 <head>
     <meta charset="UTF-8">
     <title>接口文档</title>
-    <link rel="icon" type="image/png" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.47.1/favicon-32x32.png" sizes="32x32"/>
-    <link rel="icon" type="image/png" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.47.1/favicon-16x16.png" sizes="16x16"/>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.47.1/swagger-ui.css">
+    <link rel="icon" type="image/png" href="${config.swaggerLibrarySite}/favicon-32x32.png" sizes="32x32"/>
+    <link rel="icon" type="image/png" href="${config.swaggerLibrarySite}/favicon-16x16.png" sizes="16x16"/>
+    <link rel="stylesheet" type="text/css" href="${config.swaggerLibrarySite}/swagger-ui.css">
     <style>
         html {
             box-sizing: border-box;
@@ -290,9 +294,14 @@ const getHtml = (urls: object[], config: CoaSwaggerConfig) => `
             padding: 0 20px 0 10px;
             margin-bottom: 0;
         }
+
+        /* 标题框轮廓 */
+        .swagger-ui .opblock-summary-control {
+            outline: none !important;
+        }
         
         /* 接口标题上下间距 */
-        .opblock-tag-section > div {
+        .swagger-ui .opblock-tag-section > div {
             margin-top: 15px !important;
         }
         
@@ -350,8 +359,8 @@ const getHtml = (urls: object[], config: CoaSwaggerConfig) => `
 </head>
 <body>
 <div id="swagger-ui"></div>
-<script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.47.1/swagger-ui-bundle.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.47.1/swagger-ui-standalone-preset.js"></script>
+<script src="${config.swaggerLibrarySite}/swagger-ui-bundle.js"></script>
+<script src="${config.swaggerLibrarySite}/swagger-ui-standalone-preset.js"></script>
 <script>
     window.onload = function () {
 
