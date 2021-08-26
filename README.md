@@ -16,7 +16,7 @@ A simple, fast, lightweight HTTP service frame, is born for the API.
 - **Flexible** Support micro-service, Serverless mode, Context free expansion
 - **Document friendship** Automatically generate API documents, automatically generate front-end code
 - **TypeScript** All written in TypeScript, type constraint, IDE friendship
-- **Deno** Can be supported in Deno (TODO)
+- **Deno** Can be supported in Deno (todo)
 
 ## Reference
 
@@ -32,7 +32,7 @@ A simple, fast, lightweight HTTP service frame, is born for the API.
 
 - Second version [coa-serve](https://www.npmjs.com/package/coa-serve): For the bloated problem of the first release, the various components are split based on `coajs`, separate the base components and core components into separate libraries, and **open source**. At the same time, there is a lot of optimization for document generation mechanisms, routing retrieval, system environment configuration. Currently stable, all of my online `coajs` projects have been migrated to `coa-server`
 
-- Third version [coa-http](https://www.npmjs.com/package/coa-http): The current version. With the continuous iteration, the way the interface provides service is not limited to `http`, put the `TCP`, `Websocket`, etc., directly integrate to `coa-serve` is not elegant。In addition, ~~ As the author's cognitive progress ~~, `koa` ecosystem is not the best choice. Therefore, it is planned to disassemble the `coa-serve` to reconfigure to [coa-http](https://www.npmjs.com/package/coa-http), [coa-tcp](https: // www. npmjs.com/package/coa-tcp), [coa-websocket](Https://www.npmjs.com/fectage/coa-websocket), etc. This project `coa-http` is one of these three, still in the beta stage
+- Third version [coa-http](https://www.npmjs.com/package/coa-http): The current version. With the continuous iteration, the way the interface provides service is not limited to `http`, integrate `tcp`, `websocket`, etc. Direct to `coa-serve` is not elegant. In addition, ~~As the author's cognitive progress~~, `koa` ecosystem is not the best choice. Therefore, it is planned to disassemble the `coa-serve` to reconfigure to [coa-http](https://www.npmjs.com/package/coa-http), [coa-tcp](https://www.npmjs.com/package/coa-tcp), [coa-websocket](https://www.npmjs.com/package/coa-websocket), etc. This project `coa-http` is one of these three, still in the beta stage
 
 ## Quick Start
 

@@ -7,7 +7,7 @@
 
 [English](README.md) | 简体中文
 
-一个简单、快速、轻量的 HTTP 服务框架，专为 API 而生。
+一个简单、快速、轻量的 HTTP 服务框架，专为 API 而生
 
 ## 特性
 
@@ -16,7 +16,7 @@
 - **模式灵活** 支持微服务、Serverless 模式、Context 可自由扩展
 - **文档友好** 自动生成接口文档、自动生成前端接口代码
 - **TypeScript** 全部使用 TypeScript 编写，类型约束、IDE 友好
-- **Deno** 支持在 Deno 下运行（TODO）
+- **Deno** 支持在 Deno 下运行（todo）
 
 ## 参考
 
