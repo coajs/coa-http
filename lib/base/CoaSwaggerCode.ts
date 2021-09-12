@@ -15,7 +15,7 @@ export class CoaSwaggerCode {
     const code = new Code()
 
     // 预处理
-    _.forEach(this.router.layers, ({ group, tag, method, path, options: { name } }, key) => {
+    _.forEach(this.router.layers, ({ group, tag, options: { name } }, key) => {
       if (!name) return
       if (group !== matchGroup) return
       if (!layerTagMaps[tag]) layerTagMaps[tag] = []
@@ -80,7 +80,7 @@ class Code {
     return this.contents.join('\n')
   }
 
-  private newline(content: string = '') {
+  private newline(content = '') {
     this.contents.push(content.length ? this.indent + content : '')
   }
 

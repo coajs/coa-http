@@ -79,7 +79,7 @@ export class CoaSwagger {
     return this.data
   }
 
-  getHtml(dataUrl: string, group: string = '') {
+  getHtml(dataUrl: string, group = '') {
     const groups = {} as any
     _.forEach(this.router.layers, ({ group }) => {
       if (group && !groups[group]) groups[group] = true
@@ -108,7 +108,7 @@ export class CoaSwagger {
       summary: opt.name,
       description: opt.desc,
       tags: [tag],
-      parameters: [] as object[],
+      parameters: [] as Record<string, any>[],
       requestBody: {
         content: {
           'application/json': {},
@@ -201,7 +201,7 @@ export class CoaSwagger {
   }
 }
 
-const getHtml = (urls: object[], config: CoaSwaggerConfig) => `
+const getHtml = (urls: Record<string, any>[], config: CoaSwaggerConfig) => `
 <!DOCTYPE html>
 <html lang="zh">
 <head>

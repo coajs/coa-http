@@ -14,7 +14,7 @@ export interface CoaRouterOptions {
   legacy?: string
   access?: string
 }
-export type CoaRouterHandler<T> = (ctx: T) => Promise<object | string | undefined>
+export type CoaRouterHandler<T> = (ctx: T) => Promise<Record<string, any> | string | undefined>
 export interface CoaRouterRoutes<T> {
   [path: string]: { options: CoaRouterOptions; handler: CoaRouterHandler<T> }
 }
@@ -92,7 +92,7 @@ export class CoaRouter<T> {
   }
 
   // 路由寻址
-  lookup(method: string = '', url: string = '') {
+  lookup(method = '', url = '') {
     const params: { query: { [key: string]: string }; path: string[] } = { query: {}, path: [] }
 
     const urls = url.split('?')

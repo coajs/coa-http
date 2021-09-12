@@ -20,7 +20,7 @@ export class CoaApplication<T extends CoaContext> {
     })
   }
 
-  async start(entry: string = '') {
+  async start(entry = '') {
     // 设置端口
     const port = parseInt(process.env.HOST || '') || 8000
 
@@ -56,7 +56,7 @@ export class CoaApplication<T extends CoaContext> {
       } else if (type === 'string') {
         ctx.html(body as string)
       }
-    } catch (e) {
+    } catch (e: any) {
       // 捕获错误
       const isCoaError = e.name === 'CoaError'
       const isCoaContextError = e.name === 'CoaContextError'
