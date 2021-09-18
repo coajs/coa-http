@@ -7,7 +7,7 @@ import * as querystring from 'querystring'
 export interface CoaRouterOptions {
   name?: string
   desc?: string
-  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'ALL'
   param?: { [i: string]: any }
   result?: { [i: string]: any }
   delete?: boolean
@@ -112,7 +112,7 @@ export class CoaRouter<T> {
     }
 
     layer || CoaError.throw('Gateway.NotFound', '网关接口不存在')
-    layer.method === method || CoaError.throw('Gateway.MethodNotAllowed', '当前网关接口请求方式不被允许')
+    layer.method === 'ALL' || layer.method === method || CoaError.throw('Gateway.MethodNotAllowed', '当前网关接口请求方式不被允许')
     const handler = layer.handler || CoaError.throw('Gateway.HandlerNotFound', '当前网关接口处理方法不存在')
     const group = layer.group
 
