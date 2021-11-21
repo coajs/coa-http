@@ -64,6 +64,7 @@ export class CoaHttp<T extends CoaContext> {
     })
     // 注册常用路由
     this.router.on('GET', baseUrl + 'version', async () => this.env.version)
+    this.router.on('ALL', '/', async () => '')
     this.router.on('GET', '/health', async () => '')
     this.router.on('GET', '/favicon.ico', async () => '')
   }
