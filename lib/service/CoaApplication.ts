@@ -53,8 +53,11 @@ export class CoaApplication<T extends CoaContext> {
       // 请求拦截器
       await this.interceptor?.request(ctx)
 
-      // 执行方法
-      const body = await handler(ctx)
+      // 执行方法得到结果
+      const handlerBody = await handler(ctx)
+      const interceptorBody = await this.interceptor?.response(ctx, handlerBody)
+
+      const body = interceptorBody || handlerBody
       const type = typeof body
 
       if (type === 'object') {
