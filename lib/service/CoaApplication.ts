@@ -73,14 +73,21 @@ export class CoaApplication<T extends CoaContext> {
       // 判断是否打印错误
       if (!(isCoaError || isCoaContextError) || e.stdout !== false) echo.error(e.stack || e.toString() || e)
 
-      const error = {
-        code: (isCoaError && e.code) || (isCoaContextError && 'Context.Error.' + _.toString(e.code)) || 'Gateway.HandlerError',
-        message: e.message || e.toString(),
+      // 默认错误处理
+      const handlerError = {
+        error: {
+          code: (isCoaError && e.code) || (isCoaContextError && 'Context.Error.' + _.toString(e.code)) || 'Gateway.HandlerError',
+          message: e.message || e.toString(),
+        },
       }
-      ctx.json({ error })
+      // 错误拦截器
+      const interceptorError = await this.interceptor?.responseError(handlerError, e)
+      // 得到最终结果
+      const error = interceptorError || handlerError
+      ctx.json(error)
 
       echo.warn('# 请求: %s %s %j', ctx.req.method, ctx.req.url, ctx.request.body)
-      echo.warn('# 返回: %j', { error })
+      echo.warn('# 返回: %j', error)
     }
 
     // 如果不处理，则直接返回结果
