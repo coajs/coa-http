@@ -81,7 +81,7 @@ export class CoaApplication<T extends CoaContext> {
         },
       }
       // 错误拦截器
-      const interceptorError = this.interceptor?.responseError(handlerError, e)
+      const interceptorError = await this.interceptor?.responseError(handlerError, e)
       // 得到最终结果
       const error = interceptorError || handlerError
       ctx.json(error)
