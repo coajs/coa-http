@@ -14,7 +14,8 @@ export interface CoaRouterOptions {
   legacy?: string
   access?: string
 }
-export type CoaRouterHandler<T> = (ctx: T) => Promise<Record<string, any> | string | undefined>
+export type CoaRouterHandlerResult = Record<string, any> | string | undefined
+export type CoaRouterHandler<T> = (ctx: T) => Promise<CoaRouterHandlerResult>
 export interface CoaRouterRoutes<T> {
   [path: string]: { options: CoaRouterOptions; handler: CoaRouterHandler<T> }
 }

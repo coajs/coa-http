@@ -3,11 +3,14 @@ import { _ } from 'coa-helper'
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http'
 import { CoaRequestBody } from '../base/CoaRequestBody'
 import { CoaContext, CoaContextConstructor } from './CoaContext'
+import { CoaInterceptor } from './CoaInterceptor'
 import { CoaRouter } from './CoaRouter'
 
 export class CoaApplication<T extends CoaContext> {
   public readonly server: Server
   public readonly router: CoaRouter<T>
+  public interceptor?: CoaInterceptor
+
   private readonly Context: CoaContextConstructor<T>
   private readonly startAt: bigint = process.hrtime.bigint()
 
@@ -46,6 +49,9 @@ export class CoaApplication<T extends CoaContext> {
 
       // 如果是系统默认路由，则不显示请求记录
       if (!group) ctx.runtime.accessLog = false
+
+      // 请求拦截器
+      await this.interceptor?.request(ctx)
 
       // 执行方法
       const body = await handler(ctx)

@@ -3,6 +3,7 @@ import { CoaSwagger, CoaSwaggerConfig } from '../base/CoaSwagger'
 import { CoaSwaggerCode } from '../base/CoaSwaggerCode'
 import { CoaApplication } from './CoaApplication'
 import { CoaContext, CoaContextConstructor } from './CoaContext'
+import { CoaInterceptor } from './CoaInterceptor'
 import { CoaRouter, CoaRouterConfig, CoaRouterRoutes } from './CoaRouter'
 
 interface CoaHttpConfig extends CoaRouterConfig, CoaSwaggerConfig {
@@ -14,15 +15,25 @@ export class CoaHttp<T extends CoaContext> {
 
   private readonly application: CoaApplication<T>
   private readonly config: CoaHttpConfig
-  private readonly env: CoaEnv
+  private env?: CoaEnv
 
-  constructor(Context: CoaContextConstructor<T>, env?: CoaEnv, config?: Partial<CoaHttpConfig>) {
-    this.env = env || new CoaEnv('1.0.0')
+  constructor(Context: CoaContextConstructor<T>, config?: Partial<CoaHttpConfig>) {
     this.config = Object.assign({ routeDir: 'gateway' }, config) as CoaHttpConfig
     this.router = new CoaRouter<T>(this.config)
     this.application = new CoaApplication<T>(Context, this.router)
   }
 
+  // 使用拦截器
+  useInterceptor(interceptor: CoaInterceptor) {
+    this.application.interceptor = interceptor
+  }
+
+  // 使用环境
+  useEnv(env: CoaEnv) {
+    this.env = env
+  }
+
+  // 开始启动
   async start() {
     // 注册系统默认路由
     this.registerSystemRoute()
@@ -56,14 +67,14 @@ export class CoaHttp<T extends CoaContext> {
     })
     this.router.on('GET', baseUrl + 'doc.json', async (ctx) => {
       const swagger = new CoaSwagger(this.router, this.config)
-      return swagger.getData(ctx.request.query.group, `${ctx.protocol}://${ctx.host}`, baseUrl + 'doc.code?group=', this.env.version)
+      return swagger.getData(ctx.request.query.group, `${ctx.protocol}://${ctx.host}`, baseUrl + 'doc.code?group=', this.env?.version || '1.0.0')
     })
     this.router.on('GET', baseUrl + 'doc.code', async (ctx) => {
       const swaggerCode = new CoaSwaggerCode(this.router)
       return swaggerCode.getHtml(baseUrl, ctx.request.query.group)
     })
     // 注册常用路由
-    this.router.on('GET', baseUrl + 'version', async () => this.env.version)
+    this.router.on('GET', baseUrl + 'version', async () => this.env?.version || '1.0.0')
     this.router.on('ALL', '/', async () => '')
     this.router.on('GET', '/health', async () => '')
     this.router.on('GET', '/favicon.ico', async () => '')

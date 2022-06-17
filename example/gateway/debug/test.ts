@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync } from 'fs'
+import { forEach, toString } from 'lodash'
 import { http } from '..'
-import _ = require('lodash')
 
 http.router.register('调试', {
   '/debug/test/hello': {
@@ -35,8 +35,8 @@ http.router.register('调试', {
 
       mkdirSync(dir, { recursive: true })
 
-      _.forEach(ctx.request.file, (item) => {
-        const file = 'file' + Date.now().toString() + _.toString(item.filename)
+      forEach(ctx.request.file, (item) => {
+        const file = 'file' + Date.now().toString() + toString(item.filename)
         writeFileSync(dir + file, item.data)
         files.push(file)
       })
